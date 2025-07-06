@@ -1,7 +1,7 @@
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-
+import {createStreamUser} from "../lib/stream.js"
 export const signup = async (req, res) => {
   const { email, password, fullName } = req.body;
 
@@ -37,6 +37,21 @@ export const signup = async (req, res) => {
       profilePic: randomAvatar,
     });
 
+    try {
+         await createStreamUser({
+       id:newUser._id.toString(),
+       name:newUser.fullName,
+       image:newUser.profilePic||"",
+        
+      
+    })
+     console.log(`stream user created successfully ${newUser.fullName}`);
+     
+    } catch (error) {
+       console.log("error creating stream user",error);
+       
+    }
+   
     await newUser.save(); // Save before generating token
 
     const token = jwt.sign(
@@ -61,9 +76,69 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  res.send("Login controller working");
+  const { email, password } = req.body;
+
+  try {
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // Create JWT
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "7d" }
+    );
+
+    // Set token in cookie
+    res.cookie("jwt", token, {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production"
+    });
+
+    // Send user info (excluding password)
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profilePic: user.profilePic
+      }
+    });
+
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production"
+    });
+
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error("Error during logout:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
-export const logout = async (req, res) => {
-  res.send("Logout controller working");
-};

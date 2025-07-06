@@ -9,3 +9,4 @@ export const login = (req, res) => {
 export const logout = (req, res) => {
   res.send("Logout controller working");
 };
+

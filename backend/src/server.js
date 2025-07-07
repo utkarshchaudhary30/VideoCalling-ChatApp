@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import authRoutes from "./route/auth.route.js";
+import userRoutes from "./route/user.route.js";
 import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 dotenv.config();
@@ -12,6 +13,7 @@ app.use(express.json()); // To parse JSON request bodies
 app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/users",userRoutes);
 
 // Catch-all 404 route
 app.use((req, res) => {

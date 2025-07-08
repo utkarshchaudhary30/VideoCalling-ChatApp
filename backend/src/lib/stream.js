@@ -24,7 +24,8 @@ export const createStreamUser = async (userData) => {
 // Generate a Stream Chat token for a given user ID
 export const generateStreamToken = async (userId) => {
   try {
-    const token = streamClient.createToken(userId);
+    const userIdStr=userId.toString();
+    const token = streamClient.createToken(userIdStr);
     return token;
   } catch (error) {
     console.error("Error generating Stream token:", error.message);

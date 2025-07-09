@@ -1,14 +1,21 @@
+// routes/auth.route.js
 import express from "express";
-import { signup, login, logout,onboarding } from "../controllers/auth.controller.js";
+import { signup, login, logout, onboarding } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
+
 const router = express.Router();
 
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
-router.post("/onboarding",protectRoute,onboarding);
-// check if user is logged in or not 
-router.get("/me",protectRoute,(req,res)=>{
-    res.status(200).json({success:true,user:req.user});
-})
+router.post("/onboarding", protectRoute, onboarding);
+
+// ✅ Return user if authenticated (used by frontend to check auth status)
+router.get("/me", protectRoute, (req, res) => {
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  });
+});
+
 export default router;

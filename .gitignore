@@ -4,10 +4,14 @@
 
 # Frontend
 /frontend/node_modules/
+/frontend/.env
 
-/*.log
+# Logs
+*.log
+
+# macOS system file
 .DS_Store
 
-# Optional: OS or editor-specific
+# Editor folders
 .vscode/
 .idea/

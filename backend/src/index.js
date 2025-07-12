@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+
 import dotenv from "dotenv";
 import authRoutes from "./route/auth.route.js";
 import userRoutes from "./route/user.route.js";
@@ -9,8 +10,9 @@ import cookieParser from "cookie-parser";
 
 dotenv.config();
 
-const app = express();
+const app = express(); 
 const PORT = process.env.PORT || 5000;
+
 app.use(cors({
    origin:"http://localhost:5173",
    credentials:true
@@ -27,6 +29,7 @@ app.use("/api/chat",chatRoutes);
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port number: ${PORT}`);
